@@ -9,14 +9,12 @@ import uuid
 # 1. ★設定エリア：Secretsから情報を取得
 # ==========================================
 try:
-    # Streamlit CloudのSecretsから読み込み
     FIXED_API_KEY = st.secrets["FISH_AUDIO_API_KEY"]
     DEFAULT_MODEL_ID = st.secrets["FISH_AUDIO_MODEL_ID"]
 except Exception:
-    # ローカル実行時やSecrets未設定時のデフォルト値
     FIXED_API_KEY = ""
     DEFAULT_MODEL_ID = "74bd3fcb1f804bf9b2fa5ade3e8e0870"
-    
+
 # ==========================================
 # 2. ページ設定 & カスタムデザイン (CSS)
 # ==========================================
@@ -24,71 +22,100 @@ st.set_page_config(page_title="VOICE GEN PRO", page_icon="🔊", layout="centere
 
 st.markdown("""
 <style>
-    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap');
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;700&family=Noto+Sans+JP:wght@400;700&display=swap');
     
+    /* 背景をベージュに変更 */
     html, body, [data-testid="stAppViewContainer"] {
-        background-color: #000000 !important;
-        color: #f5f5f5 !important;
-        font-family: 'Inter', sans-serif !important;
+        background-color: #f2f0eb !important;
+        color: #1a1a1a !important;
+        font-family: 'Inter', 'Noto Sans JP', sans-serif !important;
     }
     
+    /* ヘッダー部分 */
     .main-title {
         font-weight: 700;
-        letter-spacing: -0.05em;
+        letter-spacing: -0.02em;
         font-size: 3rem;
         text-align: center;
         margin-top: 50px;
-        color: #ffffff;
+        color: #000000;
     }
     .sub-title {
         text-align: center;
-        color: #666;
-        font-size: 0.8rem;
+        color: #8c8a84;
+        font-size: 0.75rem;
         margin-bottom: 4rem;
         letter-spacing: 0.2em;
         text-transform: uppercase;
     }
 
+    /* 入力フィールド・セレクトボックス */
     .stTextArea textarea, .stTextInput input {
-        background-color: #000 !important;
-        color: #fff !important;
-        border: 1px solid #222 !important;
+        background-color: transparent !important;
+        color: #000 !important;
+        border: 1px solid #1a1a1a !important;
         border-radius: 0px !important;
         padding: 15px !important;
     }
     
     div[data-baseweb="select"] > div {
-        background-color: #000 !important;
-        border: 1px solid #222 !important;
+        background-color: transparent !important;
+        border: 1px solid #1a1a1a !important;
         border-radius: 0px !important;
+        color: #000 !important;
     }
 
+    /* ラベル文字 */
+    label p {
+        color: #1a1a1a !important;
+        font-weight: 700 !important;
+        letter-spacing: 0.05em;
+    }
+
+    /* ボタンデザイン：黒背景に白文字 */
     .stButton > button {
-        background-color: #ffffff !important;
-        color: #000000 !important;
+        background-color: #000000 !important;
+        color: #ffffff !important;
         border: none !important;
         border-radius: 0px !important;
-        padding: 15px !important;
+        padding: 18px !important;
         font-weight: 700 !important;
-        letter-spacing: 0.1em;
+        letter-spacing: 0.15em;
         width: 100%;
         margin-top: 20px;
+        transition: opacity 0.3s;
+    }
+    .stButton > button:hover {
+        background-color: #333333 !important;
+        color: #ffffff !important;
+        opacity: 0.8;
     }
     
+    /* ダウンロードボタン：枠線のみ */
     [data-testid="stDownloadButton"] > button {
         background-color: transparent !important;
-        color: #fff !important;
-        border: 1px solid #333 !important;
+        color: #000 !important;
+        border: 1px solid #1a1a1a !important;
         border-radius: 0px !important;
     }
+    [data-testid="stDownloadButton"] > button:hover {
+        background-color: #1a1a1a !important;
+        color: #fff !important;
+    }
 
+    /* オーディオプレイヤー（ベージュに合わせた色調調整） */
     audio {
-        filter: invert(100%) hue-rotate(180deg) brightness(1.5);
         width: 100%;
         margin-top: 30px;
     }
 
+    /* 不要な要素の非表示 */
     #MainMenu, footer, header {visibility: hidden;}
+    
+    /* 区切り線 */
+    hr {
+        border-top: 1px solid #1a1a1a !important;
+    }
 </style>
 """, unsafe_allow_html=True)
 
@@ -116,7 +143,7 @@ emotions_data = {
 # --- API処理 (48000Hz) ---
 def generate_audio(text, model_id):
     if not FIXED_API_KEY:
-        return None, "API Key is not set in Secrets."
+        return None, "API Key is missing."
         
     url = "https://api.fish.audio/v1/tts"
     headers = {
@@ -145,12 +172,12 @@ def generate_audio(text, model_id):
 
 # --- UI構築 ---
 st.markdown('<h1 class="main-title">VOICE GEN PRO</h1>', unsafe_allow_html=True)
-st.markdown('<p class="sub-title">48kHz / High-Fidelity Export</p>', unsafe_allow_html=True)
+st.markdown('<p class="sub-title">High-Fidelity Audio Synthesis</p>', unsafe_allow_html=True)
 
 st.markdown("### SETTINGS")
 model_id_input = st.text_input("MODEL ID", value=DEFAULT_MODEL_ID)
 
-st.markdown("---")
+st.divider()
 
 col_cat, col_det = st.columns(2)
 with col_cat:
@@ -165,15 +192,15 @@ with col_det:
         selected_label = st.selectbox("DETAIL", list(current_options.keys()))
         emotion_tag = current_options[selected_label]
 
-text_input = st.text_area("PROMPT", height=200, placeholder="Enter text here...")
+text_input = st.text_area("PROMPT", height=220, placeholder="Enter text to generate audio...")
 
-if st.button("RUN SYNTHESIS"):
+if st.button("RUN GENERATION"):
     if not text_input:
         st.warning("Please enter some text.")
     else:
         final_prompt = f"{emotion_tag} {text_input}" if emotion_tag else text_input
         
-        with st.spinner("Processing..."):
+        with st.spinner("Synthesizing..."):
             wav_data, error = generate_audio(final_prompt, model_id_input)
             
             if error:
