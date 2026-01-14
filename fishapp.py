@@ -209,7 +209,7 @@ if st.button("RUN GENERATION"):
                 st.audio(wav_data, format="audio/wav")
                 
                 st.download_button(
-                    label="DOWNLOAD WAV (48kHz)",
+                    label="DOWNLOAD WAV (44.1kHz)",
                     data=wav_data,
                     file_name=f"export_{uuid.uuid4().hex[:6]}.wav",
                     mime="audio/wav"
