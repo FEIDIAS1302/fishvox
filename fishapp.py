@@ -8,12 +8,15 @@ import uuid
 # ==========================================
 # 1. ★設定エリア：Secretsから情報を取得
 # ==========================================
-# Streamlit Cloudの管理画面で設定した値を取得します
 try:
+    # Streamlit CloudのSecretsから読み込み
     FIXED_API_KEY = st.secrets["FISH_AUDIO_API_KEY"]
     DEFAULT_MODEL_ID = st.secrets["FISH_AUDIO_MODEL_ID"]
-
-
+except Exception:
+    # ローカル実行時やSecrets未設定時のデフォルト値
+    FIXED_API_KEY = ""
+    DEFAULT_MODEL_ID = "74bd3fcb1f804bf9b2fa5ade3e8e0870"
+    
 # ==========================================
 # 2. ページ設定 & カスタムデザイン (CSS)
 # ==========================================
