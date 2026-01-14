@@ -164,7 +164,7 @@ def generate_audio(text, model_id):
 
         audio_int16 = np.frombuffer(response.content, dtype=np.int16)
         wav_buffer = io.BytesIO()
-        sf.write(wav_buffer, audio_int16, 48000, format='WAV', subtype='PCM_16')
+        sf.write(wav_buffer, audio_int16, 44100, format='WAV', subtype='PCM_16')
         wav_buffer.seek(0)
         return wav_buffer, None
     except Exception as e:
