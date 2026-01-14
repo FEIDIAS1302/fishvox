@@ -154,7 +154,7 @@ def generate_audio(text, model_id):
         "text": text,
         "reference_id": model_id,
         "format": "pcm", 
-        "sample_rate": 48000
+        "sample_rate": 44100
     }
     
     try:
